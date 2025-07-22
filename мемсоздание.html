@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МемоГенератор - Создай свой мем!</title>
+    <style>
+        :root {
+            --primary: #ff3366;
+            --secondary: #6633ff;
+            --dark: #1a1a2e;
+            --light: #f0f0f5;
+            --accent: #00cc99;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark), #16213e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(255, 51, 102, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .editor-panel {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .preview-panel {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            font-size: 1.5rem;
+        }
+        
+        .upload-area {
+            border: 3px dashed var(--secondary);
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(102, 51, 255, 0.1);
+        }
+        
+        .upload-area:hover {
+            background: rgba(102, 51, 255, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .text-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .text-input {
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px var(--accent);
+        }
+        
+        .text-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .meme-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        #meme-canvas {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            background: #2d2d44;
+            display: none;
+        }
+        
+        .canvas-placeholder {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: rgba(45, 45, 68, 0.5);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed var(--primary);
+        }
+        
+        .placeholder-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 51, 102, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 51, 102, 0.6);
+        }
+        
+        .btn-download {
+            margin-top: 25px;
+            background: linear-gradient(to right, var(--accent), #00aaff);
+            color: var(--dark);
+            box-shadow: 0 5px 15px rgba(0, 204, 153, 0.4);
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 204, 153, 0.6);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .control-group {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+        
+        .font-select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+        }
+        
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .example-img {
+            width: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .example-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .toggle-templates {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-templates:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .templates-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .templates-container.visible {
+            max-height: 500px;
+            margin-top: 15px;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-laugh-beam"></i> МемоГенератор</h1>
+            <p class="subtitle">Создавай смешные мемы за секунды! Загружай картинку, добавляй текст и делись с друзьями</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="editor-panel">
+                <h2 class="section-title"><i class="fas fa-edit"></i> Создание мема</h2>
+                
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>Перетащи сюда картинку</h3>
+                    <p>или кликни для выбора файла</p>
+                    <input type="file" id="image-upload" accept="image/*" class="hidden">
+                </div>
+                
+                <div class="text-inputs">
+                    <input type="text" id="top-text" class="text-input" placeholder="Введи текст сверху...">
+                    <input type="text" id="bottom-text" class="text-input" placeholder="Введи текст снизу...">
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label class="control-label">Размер текста</label>
+                        <input type="range" min="20" max="80" value="40" class="slider" id="font-size">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label class="control-label">Цвет текста</label>
+                        <input type="color" id="text-color" value="#ffffff" class="text-input" style="height: 40px; padding: 5px;">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label class="control-label">Шрифт</label>
+                        <select id="font-family" class="font-select">
+                            <option value="Impact">Impact (классика)</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Comic Sans MS">Comic Sans</option>
+                            <option value="'Courier New'">Courier New</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" id="watermark-checkbox" checked>
+                    <label for="watermark-checkbox">Добавлять водяной знак</label>
+                </div>
+                
+                <button class="toggle-templates" id="toggle-templates">
+                    <i class="fas fa-chevron-down"></i> Показать популярные шаблоны
+                </button>
+                
+                <div class="templates-container" id="templates-container">
+                    <div class="examples">
+                        <img src="https://memepedia.ru/wp-content/uploads/2020/10/big-floppa-meme.png" class="example-img" data-template="floppa">
+                        <img src="https://i.pinimg.com/736x/30/62/55/3062555bfdb5a577063afaa31ea581db.jpg" class="example-img" data-template="surprised_cat">
+                        <img src="https://i.pinimg.com/564x/eb/2a/20/eb2a2087167a3ab553aedb387d2ae056.jpg" class="example-img" data-template="dragon">
+                        <img src="https://i.pinimg.com/736x/11/89/fb/1189fb803b9e87494fba211ae5d7ec8c.jpg" class="example-img" data-template="funny_cat">
+                        <img src="https://memepedia.ru/wp-content/uploads/2019/08/udivlennyj-pikachu.jpg" class="example-img" data-template="pikachu">
+                        <img src="https://memepedia.ru/wp-content/uploads/2017/05/plakalka.jpg" class="example-img" data-template="crying">
+                        <img src="https://memepedia.ru/wp-content/uploads/2017/05/udivlennyj-dzhordzh-bush.jpg" class="example-img" data-template="bush">
+                        <img src="https://memepedia.ru/wp-content/uploads/2017/05/ya-dovolen.jpg" class="example-img" data-template="satisfied">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="preview-panel">
+                <h2 class="section-title"><i class="fas fa-eye"></i> Превью</h2>
+                
+                <div class="meme-container">
+                    <canvas id="meme-canvas"></canvas>
+                    <div class="canvas-placeholder" id="canvas-placeholder">
+                        <div class="placeholder-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <h3>Твой мем появится здесь</h3>
+                        <p>Загрузи картинку и добавь текст</p>
+                    </div>
+                </div>
+                
+                <button id="download-btn" class="btn btn-download">
+                    <i class="fas fa-download"></i> Скачать мем
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Разработал Treaplex  | МемоГенератор 2025</p>
+            <p>Просто, быстро, смешно!</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы DOM
+            const uploadArea = document.getElementById('upload-area');
+            const imageUpload = document.getElementById('image-upload');
+            const topTextInput = document.getElementById('top-text');
+            const bottomTextInput = document.getElementById('bottom-text');
+            const canvas = document.getElementById('meme-canvas');
+            const ctx = canvas.getContext('2d');
+            const canvasPlaceholder = document.getElementById('canvas-placeholder');
+            const downloadBtn = document.getElementById('download-btn');
+            const fontSizeSlider = document.getElementById('font-size');
+            const textColorPicker = document.getElementById('text-color');
+            const fontFamilySelect = document.getElementById('font-family');
+            const exampleImages = document.querySelectorAll('.example-img');
+            const toggleTemplatesBtn = document.getElementById('toggle-templates');
+            const templatesContainer = document.getElementById('templates-container');
+            const watermarkCheckbox = document.getElementById('watermark-checkbox');
+            
+            // Переменные состояния
+            let uploadedImage = null;
+            let templatesVisible = false;
+            
+            // Обработчики событий
+            uploadArea.addEventListener('click', () => imageUpload.click());
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#00cc99';
+                uploadArea.style.transform = 'scale(1.02)';
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '#6633ff';
+                uploadArea.style.transform = 'scale(1)';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#6633ff';
+                uploadArea.style.transform = 'scale(1)';
+                
+                if (e.dataTransfer.files[0]) {
+                    imageUpload.files = e.dataTransfer.files;
+                    loadImage(e.dataTransfer.files[0]);
+                }
+            });
+            
+            imageUpload.addEventListener('change', (e) => {
+                if (e.target.files[0]) {
+                    loadImage(e.target.files[0]);
+                }
+            });
+            
+            topTextInput.addEventListener('input', drawMeme);
+            bottomTextInput.addEventListener('input', drawMeme);
+            fontSizeSlider.addEventListener('input', drawMeme);
+            textColorPicker.addEventListener('input', drawMeme);
+            fontFamilySelect.addEventListener('change', drawMeme);
+            watermarkCheckbox.addEventListener('change', drawMeme);
+            
+            downloadBtn.addEventListener('click', downloadMeme);
+            
+            toggleTemplatesBtn.addEventListener('click', toggleTemplates);
+            
+            exampleImages.forEach(img => {
+                img.addEventListener('click', () => {
+                    const template = img.getAttribute('data-template');
+                    useTemplate(template);
+                });
+            });
+            
+            // Функция переключения видимости шаблонов
+            function toggleTemplates() {
+                templatesVisible = !templatesVisible;
+                templatesContainer.classList.toggle('visible', templatesVisible);
+                toggleTemplatesBtn.innerHTML = templatesVisible 
+                    ? '<i class="fas fa-chevron-up"></i> Скрыть популярные шаблоны' 
+                    : '<i class="fas fa-chevron-down"></i> Показать популярные шаблоны';
+            }
+            
+            // Функция загрузки изображения
+            function loadImage(file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        uploadedImage = img;
+                        canvas.style.display = 'block';
+                        canvasPlaceholder.style.display = 'none';
+                        drawMeme();
+                    };
+                    img.src = e.target.result;
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            // Функция отрисовки мема
+            function drawMeme() {
+                if (!uploadedImage) return;
+                
+                // Установка размеров canvas
+                const maxWidth = 500;
+                const ratio = Math.min(maxWidth / uploadedImage.width, 1);
+                canvas.width = uploadedImage.width * ratio;
+                canvas.height = uploadedImage.height * ratio;
+                
+                // Очистка canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Рисование изображения
+                ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+                
+                // Настройки текста
+                const fontSize = parseInt(fontSizeSlider.value);
+                const fontFamily = fontFamilySelect.value;
+                const textColor = textColorPicker.value;
+                
+                ctx.font = `${fontSize}px "${fontFamily}"`;
+                ctx.fillStyle = textColor;
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = fontSize / 10;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                
+                // Добавление верхнего текста
+                if (topTextInput.value) {
+                    const topText = topTextInput.value.toUpperCase();
+                    const x = canvas.width / 2;
+                    const y = 10;
+                    
+                    ctx.strokeText(topText, x, y);
+                    ctx.fillText(topText, x, y);
+                }
+                
+                // Добавление нижнего текста
+                if (bottomTextInput.value) {
+                    const bottomText = bottomTextInput.value.toUpperCase();
+                    const x = canvas.width / 2;
+                    const y = canvas.height - fontSize - 10;
+                    
+                    ctx.strokeText(bottomText, x, y);
+                    ctx.fillText(bottomText, x, y);
+                }
+                
+                // Добавление водяного знака
+                if (watermarkCheckbox.checked) {
+                    ctx.font = '16px Arial';
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.textAlign = 'right';
+                    ctx.textBaseline = 'bottom';
+                    
+                    const watermarkText = 'МемоГенератор 😊';
+                    const x = canvas.width - 10;
+                    const y = canvas.height - 10;
+                    
+                    ctx.strokeText(watermarkText, x, y);
+                    ctx.fillText(watermarkText, x, y);
+                }
+            }
+            
+            // Функция скачивания мема
+            function downloadMeme() {
+                if (!uploadedImage) {
+                    alert('Сначала загрузи картинку!');
+                    return;
+                }
+                
+                const link = document.createElement('a');
+                link.download = 'my-meme.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+            
+            // Функция использования шаблона
+            function useTemplate(template) {
+                const templateImages = {
+                    floppa: 'https://memepedia.ru/wp-content/uploads/2020/06/big-floppa-1.jpg',
+                    surprised_cat: 'https://i.pinimg.com/736x/30/62/55/3062555bfdb5a577063afaa31ea581db.jpg',
+                    dragon: 'https://i.pinimg.com/564x/eb/2a/20/eb2a2087167a3ab553aedb387d2ae056.jpg',
+                    funny_cat: 'https://i.pinimg.com/736x/11/89/fb/1189fb803b9e87494fba211ae5d7ec8c.jpg',
+                    pikachu: 'https://memepedia.ru/wp-content/uploads/2019/08/udivlennyj-pikachu.jpg',
+                    crying: 'https://memepedia.ru/wp-content/uploads/2017/05/plakalka.jpg',
+                    bush: 'https://memepedia.ru/wp-content/uploads/2017/05/udivlennyj-dzhordzh-bush.jpg',
+                    satisfied: 'https://memepedia.ru/wp-content/uploads/2017/05/ya-dovolen.jpg'
+                };
+                
+                const defaultTexts = {
+                    floppa: { top: 'БОЛЬШОЙ ФЛОППА', bottom: 'Смотрит на тебя' },
+                    surprised_cat: { top: 'ЧТО', bottom: 'ЗА Х?' },
+                    dragon: { top: 'ЗАЧЕМ', bottom: 'ТЫ ЭТО СДЕЛАЛ?' },
+                    funny_cat: { top: 'КОГДА ТЫ', bottom: 'ПОНЯЛ ШУТКУ' },
+                    pikachu: { top: 'ПИКАЧУ', bottom: 'УДИВЛЁН' },
+                    crying: { top: 'Я', bottom: 'ПЛАКАЛ' },
+                    bush: { top: 'ДЖОРДЖ БУШ', bottom: 'ШОКИРОВАН' },
+                    satisfied: { top: 'Я', bottom: 'ДОВОЛЕН' }
+                };
+                
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = function() {
+                    uploadedImage = img;
+                    canvas.style.display = 'block';
+                    canvasPlaceholder.style.display = 'none';
+                    
+                    // Установка текста по умолчанию для шаблонов
+                    if (defaultTexts[template]) {
+                        topTextInput.value = defaultTexts[template].top;
+                        bottomTextInput.value = defaultTexts[template].bottom;
+                    }
+                    
+                    drawMeme();
+                };
+                img.src = templateImages[template];
+            }
+            
+            // Инициализация с примером
+            useTemplate('surprised_cat');
+        });
+    </script>
+</body>
+</html>
